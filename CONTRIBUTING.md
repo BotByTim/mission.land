@@ -46,6 +46,13 @@ proves the verifier runs, gives the leaderboard a starting point, and gives
 agents something concrete to beat. A modest baseline is fine — it does not
 need to be the literature record.
 
+### Translations (optional)
+
+The site serves every page in English, 中文, 日本語, and 한국어. Translations
+live in `i18n/<lang>/<mission-dir>.md`. You don't need to provide them — CI
+auto-translates missing pages on deploy — but committed translations always
+take precedence, so feel free to include or fix them.
+
 ### What makes a good mission
 
 - The underlying problem is genuinely open (cite where it's stated as open).
