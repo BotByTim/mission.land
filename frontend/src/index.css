@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Cinzel Decorative", serif;
+  --font-body: "EB Garamond", Georgia, serif;
+
+  --color-ink: #3a2410;
+  --color-ink-body: #4a3822;
+  --color-ink-muted: #6a5230;
+  --color-ink-soft: #8a6a38;
+  --color-parchment: #efe2c4;
+  --color-card: #f6ecd2;
+  --color-card-hover: #f9f0d8;
+  --color-callout: #e7d3a4;
+  --color-lore: #efe6cc;
+  --color-wood: #5b3d22;
+  --color-cardline: #c8ad78;
+  --color-divider: #b89a63;
+  --color-crimson: #8f2d2d;
+  --color-gold: #a8801f;
+  --color-gold-bright: #e0b74a;
+  --color-quest-green: #5a8f3a;
+  --color-legendary: #5a2d8f;
+  --color-ondark: #e9d7b0;
+  --color-ondark-soft: #c9b487;
+  --color-darkbox: #2a1c10;
+  --color-medal-gold: #c9a227;
+  --color-medal-silver: #9a9aa0;
+  --color-medal-bronze: #b0763a;
+  --color-bar-track: #ddc79a;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-ink-body);
+}
+
+/* Dark tavern background */
+.bg-tavern {
+  background: radial-gradient(circle at 50% 0%, #3a2a1a, #231710);
+}
+.bg-tavern-deep {
+  background: radial-gradient(circle at 50% 0%, #3a2a1a, #1c120a);
+}
+
+/* Parchment sheet pinned in a wood frame */
+.sheet {
+  background-color: var(--color-parchment);
+  background-image: radial-gradient(rgba(120, 90, 50, 0.09) 1px, transparent 1px);
+  background-size: 5px 5px;
+  border: 14px solid var(--color-wood);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 60px rgba(90, 60, 30, 0.35),
+    0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Quest / info card */
+.qcard {
+  background: var(--color-card);
+  border: 1px solid var(--color-cardline);
+  box-shadow: 2px 3px 0 rgba(90, 60, 30, 0.25);
+}
+
+/* Hoverable row (record log, leaderboards) */
+.qrow {
+  background: var(--color-card);
+  border: 1px solid var(--color-cardline);
+  transition: transform 0.1s, background 0.1s;
+}
+.qrow:hover {
+  background: var(--color-card-hover);
+}
+.qrow-slide:hover {
+  transform: translateX(4px);
+}
+
+/* 3D-press primary button */
+.btn-quest {
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #f7edcf;
+  background: linear-gradient(#8f2d2d, #6a1f1f);
+  border: 1px solid #4a1414;
+  border-radius: 4px;
+  box-shadow: 0 4px 0 #4a1414;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.btn-quest:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #4a1414;
+}
+.btn-quest:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #4a1414;
+}
+
+/* Wax seal pulse */
+@keyframes sealpulse {
+  0%,
+  100% {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 2px 16px rgba(200, 60, 60, 0.6);
+  }
+}
+.seal {
+  animation: sealpulse 3s ease-in-out infinite;
+}
+
+/* Markdown lore rendered from mission.md */
+.lore-md p {
+  font-size: 20px;
+  line-height: 1.55;
+  margin: 0 0 10px;
+  color: var(--color-ink-body);
+}
+.lore-md p:last-child {
+  margin-bottom: 0;
+}
+.lore-md a {
+  color: var(--color-crimson);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.lore-md strong {
+  color: var(--color-ink);
+}
