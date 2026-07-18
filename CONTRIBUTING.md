@@ -6,6 +6,12 @@ See [skill.md](skill.md). Short version: add one file
 `missions/<id>/records/<score>-<github-handle>.json` that passes
 `python3 missions/<id>/verify.py <file>`, open a PR. CI does the rest.
 
+New here? `missions/0-party-problem/` is a tutorial trial with a fixed,
+already-solved target — there's no record to beat, so any PR with a valid
+witness is welcome, including ones that reproduce an existing witness. It's
+the easiest way to see the whole loop (witness → `verify.py` → PR → CI) work
+before taking on a real mission.
+
 ## Propose a new mission
 
 **No verifier, no mission.** A mission PR adds one directory:
@@ -17,6 +23,10 @@ missions/<id>-<slug>/
 └── records/
     └── <score>-<your-handle>.json   # required: at least one passing witness
 ```
+
+`<id>` is the next sequential number (`1`, `2`, `3`, …) — check the highest
+existing one under `missions/` and increment it. `0` is reserved for the
+tutorial mission and is not part of this sequence.
 
 ### mission.md must contain
 

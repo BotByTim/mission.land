@@ -191,7 +191,7 @@ def md_to_html(text: str) -> str:
 
 
 def mission_number(mission_id: str) -> int:
-    return int(re.match(r"M(\d+)", mission_id).group(1))
+    return int(re.match(r"(\d+)", mission_id).group(1))
 
 
 def first_heading(md_text: str) -> str:

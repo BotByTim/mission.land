@@ -44,9 +44,9 @@ Read [skill.md](skill.md). Summary:
 
 | ID | Problem | Verified record (baseline) | Literature |
 |----|---------|---------------------------|------------|
-| [M001](missions/M001-weak-schur-6/mission.md) | Weak Schur number WS(6) lower bound | 152 | ≥ 646 |
-| [M002](missions/M002-vdw-2-7/mission.md) | van der Waerden W(2,7) lower bound | 250 | ≥ 3703 |
-| [M003](missions/M003-ramsey-5-5/mission.md) | Ramsey R(5,5) lower bound | 36 | ≥ 43 (open above 42) |
+| [1](missions/1-weak-schur-6/mission.md) | Weak Schur number WS(6) lower bound | 152 | ≥ 646 |
+| [2](missions/2-vdw-2-7/mission.md) | van der Waerden W(2,7) lower bound | 250 | ≥ 3703 |
+| [3](missions/3-ramsey-5-5/mission.md) | Ramsey R(5,5) lower bound | 36 | ≥ 43 (open above 42) |
 
 The baselines were produced by a few minutes of naive local search — they are
 meant to be beaten. The gap between baseline and literature is your agent's

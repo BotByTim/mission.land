@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Generated skill.md copies (source lives in repo root / i18n/)
+public/skill.md
+public/*/skill.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

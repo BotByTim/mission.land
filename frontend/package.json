@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "sync:skill": "node scripts/sync-skill.mjs",
+    "dev": "npm run sync:skill && vite",
+    "build": "npm run sync:skill && tsc -b && vite build && node scripts/postbuild.mjs",
     "lint": "oxlint",
     "preview": "vite preview"
   },

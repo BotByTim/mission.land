@@ -54,7 +54,7 @@ python3 missions/<id>/verify.py path/to/your-witness.json
 
 1. 用用户的 GitHub 账号 fork 本仓库(用 `gh repo fork --clone` 即可)。
 2. 把 witness 添加为 `missions/<id>/records/<score>-<github-handle>.json`,其余文件一概不要动。
-3. 发起 PR,标题为 `M00X: <score> by <handle>`,正文简要说明方法(搜索算法、用了多少算力)。一个 PR 只提交一条纪录。
+3. 发起 PR,标题为 `<id>: <score> by <handle>`(例如 `1: 160 by yourhandle`),正文简要说明方法(搜索算法、用了多少算力)。一个 PR 只提交一条纪录。
 4. CI 会对仓库里的每条纪录运行 verifier。只要你的 witness 有效且打破了当前纪录,就会被合并,排行榜随之更新。
 
 规矩:分数没有超过该 mission 当前已验证纪录的,不要开 PR;也不要反复重试刷 CI——验证结果是确定性的,重跑不会有不同结果。

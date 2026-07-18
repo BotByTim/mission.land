@@ -54,7 +54,7 @@ python3 missions/<id>/verify.py path/to/your-witness.json
 
 1. 사용자의 GitHub 계정으로 저장소를 fork 합니다(`gh repo fork --clone`이면 충분합니다).
 2. witness를 `missions/<id>/records/<score>-<github-handle>.json`으로 추가합니다. 다른 파일은 일절 건드리지 마십시오.
-3. `M00X: <score> by <handle>` 제목으로 PR을 열고, 본문에 방법(탐색 알고리즘, 사용한 컴퓨팅)을 간단히 적습니다. PR 하나에 기록은 하나만 담습니다.
+3. `<id>: <score> by <handle>`(예: `1: 160 by yourhandle`) 제목으로 PR을 열고, 본문에 방법(탐색 알고리즘, 사용한 컴퓨팅)을 간단히 적습니다. PR 하나에 기록은 하나만 담습니다.
 4. CI가 저장소의 모든 기록에 대해 verifier를 실행합니다. witness가 유효하고 현재 기록을 넘어서면 병합되고 리더보드가 갱신됩니다.
 
 지켜야 할 예의: 해당 미션의 현재 검증 기록을 넘지 못하는 점수로는 PR을 열지 마십시오. 재시도를 반복하는 것도 무의미합니다. CI 결과는 결정적이라 다시 돌려도 달라지지 않습니다.

@@ -20,7 +20,6 @@
   --color-gold: #a8801f;
   --color-gold-bright: #e0b74a;
   --color-quest-green: #5a8f3a;
-  --color-legendary: #5a2d8f;
   --color-ondark: #e9d7b0;
   --color-ondark-soft: #c9b487;
   --color-darkbox: #2a1c10;
@@ -28,6 +27,26 @@
   --color-medal-silver: #9a9aa0;
   --color-medal-bronze: #b0763a;
   --color-bar-track: #ddc79a;
+}
+
+/*
+ * Latin-first font stacks: the Latin display/body face is always first, the
+ * per-language CJK serif is a fallback. Browsers resolve fonts glyph-by-glyph,
+ * so Latin letters and digits keep the Cinzel/Garamond look in every language
+ * while CJK characters fall through to the appropriate CJK serif — no matter
+ * which language is active, English always looks the same.
+ */
+:lang(zh) {
+  --font-display: "Cinzel Decorative", "ZCOOL XiaoWei", serif;
+  --font-body: "EB Garamond", "Noto Serif SC", Georgia, serif;
+}
+:lang(ja) {
+  --font-display: "Cinzel Decorative", "Shippori Mincho", serif;
+  --font-body: "EB Garamond", "Shippori Mincho", Georgia, serif;
+}
+:lang(ko) {
+  --font-display: "Cinzel Decorative", "Nanum Myeongjo", serif;
+  --font-body: "EB Garamond", "Nanum Myeongjo", Georgia, serif;
 }
 
 body {
@@ -54,6 +73,40 @@ body {
   box-shadow:
     inset 0 0 60px rgba(90, 60, 30, 0.35),
     0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Parchment sheet of the adventurer's scroll: darkened curls at both ends,
+   only top/bottom borders — the wooden rollers cover the sides. */
+.scroll-paper {
+  position: relative;
+  background-color: var(--color-callout);
+  background-image:
+    linear-gradient(90deg, rgba(90, 60, 30, 0.25), rgba(90, 60, 30, 0) 44px),
+    linear-gradient(-90deg, rgba(90, 60, 30, 0.25), rgba(90, 60, 30, 0) 44px),
+    radial-gradient(rgba(120, 90, 50, 0.09) 1px, transparent 1px);
+  background-size:
+    auto,
+    auto,
+    5px 5px;
+  border-top: 1px solid var(--color-cardline);
+  border-bottom: 1px solid var(--color-cardline);
+  box-shadow:
+    inset 0 10px 12px -10px rgba(74, 56, 34, 0.45),
+    inset 0 -10px 12px -10px rgba(74, 56, 34, 0.45),
+    0 8px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* Wooden roller: vertical rod taller than the paper */
+.scroll-dowel {
+  position: absolute;
+  top: -12px;
+  bottom: -12px;
+  width: 18px;
+  border-radius: 9px;
+  background: linear-gradient(90deg, #a5825a, #6b4a2a 45%, #3f2a16);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.3),
+    2px 3px 6px rgba(0, 0, 0, 0.45);
 }
 
 /* Quest / info card */

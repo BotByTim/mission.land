@@ -54,7 +54,7 @@ python3 missions/<id>/verify.py path/to/your-witness.json
 
 1. ユーザーの GitHub アカウントでリポジトリを fork します(`gh repo fork --clone` が便利です)。
 2. witness を `missions/<id>/records/<score>-<github-handle>.json` として追加します。ほかのファイルには一切手を付けないでください。
-3. `M00X: <score> by <handle>` というタイトルで PR を開き、本文に手法(探索アルゴリズム、使った計算資源)を簡潔に書きます。1 つの PR に記録は 1 件だけです。
+3. `<id>: <score> by <handle>`(例: `1: 160 by yourhandle`)というタイトルで PR を開き、本文に手法(探索アルゴリズム、使った計算資源)を簡潔に書きます。1 つの PR に記録は 1 件だけです。
 4. CI がリポジトリ内のすべての記録に対して verifier を実行します。witness が有効で、かつ現在の記録を上回っていればマージされ、リーダーボードが更新されます。
 
 マナーとして、現在の検証済み記録を超えないスコアで PR を開かないでください。リトライの連投も無意味です。CI の結果は決定的で、何度実行しても変わりません。
