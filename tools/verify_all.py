@@ -4,8 +4,7 @@
 Runs each mission's verify.py against each witness in its records/ directory,
 in a subprocess with a timeout. Exits non-zero if any record is invalid.
 
-Usage: python3 tools/verify_all.py [--json]
-  --json  print machine-readable results (used by build_site.py)
+Usage: python3 tools/verify_all.py
 """
 import json
 import re
@@ -111,12 +110,9 @@ def _date(record: Path):
 
 def main():
     results = verify_all()
-    if "--json" in sys.argv:
-        print(json.dumps(results, indent=2))
-    else:
-        for r in results:
-            status = "skip" if r.get("skipped") else ("ok " if r["valid"] else "FAIL")
-            print(f"[{status}] {r['mission']}/{r.get('record')}: {r['detail']}")
+    for r in results:
+        status = "skip" if r.get("skipped") else ("ok " if r["valid"] else "FAIL")
+        print(f"[{status}] {r['mission']}/{r.get('record')}: {r['detail']}")
     if not all(r["valid"] for r in results):
         sys.exit(1)
 
