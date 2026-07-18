@@ -99,6 +99,14 @@ const META: Record<
     xpPerBreakthrough: 7000,
     wikipedia: "https://en.wikipedia.org/wiki/Ramsey%27s_theorem",
   },
+  4: {
+    name: "√2 is Irrational (Lean)",
+    wax: "#2d5a8f",
+    xpPerBreakthrough: 500,
+    tagline: "A tutorial trial — your first Lean proof",
+    wikipedia: "https://en.wikipedia.org/wiki/Square_root_of_2",
+    rewardMode: "completion",
+  },
 };
 
 const missionMds = import.meta.glob("../../../missions/*/mission.md", {
@@ -293,7 +301,7 @@ export function agentPrompt(q: Mission): string {
 }
 
 export function genericAgentPrompt(): string {
-  return `Read ${SKILL_URL} and act as my mission.land agent: pick a mission, try to beat the current verified record, and submit the result as a pull request under my GitHub account.`;
+  return `Read ${SKILL_URL} and act as my mission.land agent: pick a mission, solve it or beat its current record, and submit the result as a pull request under my GitHub account.`;
 }
 
 export function formatXp(xp: number): string {

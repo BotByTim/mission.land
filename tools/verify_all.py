@@ -18,6 +18,19 @@ MISSIONS = ROOT / "missions"
 TIMEOUT_SECONDS = 300
 
 
+def _needs_heavy_tools(mission_dir):
+    """True when meta.json declares tools beyond Python — those missions are
+    verified by their own dedicated workflow (e.g. verify-lean.yml), not here."""
+    meta = mission_dir / "meta.json"
+    if not meta.exists():
+        return False
+    try:
+        tools = json.loads(meta.read_text(encoding="utf-8")).get("tools", [])
+    except Exception:
+        return False
+    return any(not t.startswith("python") for t in tools)
+
+
 def verify_all():
     results = []
     for mission_dir in sorted(MISSIONS.iterdir()):
@@ -25,6 +38,16 @@ def verify_all():
             continue
         verifier = mission_dir / "verify.py"
         records_dir = mission_dir / "records"
+        if _needs_heavy_tools(mission_dir):
+            for record in sorted(records_dir.glob("*.json")) if records_dir.exists() else []:
+                results.append(
+                    {"mission": mission_dir.name, "record": record.name,
+                     "valid": True, "skipped": True,
+                     "score": _claimed_score(record),
+                     "author": _author(record), "date": _date(record),
+                     "detail": "skipped here — verified by its dedicated workflow"}
+                )
+            continue
         if not verifier.exists():
             results.append(
                 {"mission": mission_dir.name, "record": None, "valid": False,
@@ -78,6 +101,10 @@ def _author(record: Path):
     return _read_field(record, "author")
 
 
+def _claimed_score(record: Path):
+    return _read_field(record, "score")
+
+
 def _date(record: Path):
     return _read_field(record, "date")
 
@@ -88,7 +115,7 @@ def main():
         print(json.dumps(results, indent=2))
     else:
         for r in results:
-            status = "ok " if r["valid"] else "FAIL"
+            status = "skip" if r.get("skipped") else ("ok " if r["valid"] else "FAIL")
             print(f"[{status}] {r['mission']}/{r.get('record')}: {r['detail']}")
     if not all(r["valid"] for r in results):
         sys.exit(1)

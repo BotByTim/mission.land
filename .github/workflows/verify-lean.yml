@@ -1,0 +1,66 @@
+name: verify-lean
+
+# Proof missions are excluded from the fast stdlib verify workflow (their
+# meta.json declares heavy tools); this workflow verifies them instead.
+# When adding a new proof mission, add its path below.
+on:
+  pull_request:
+    paths:
+      - "missions/4-sqrt2-irrational/**"
+      - "tools/lean/**"
+      - ".github/workflows/verify-lean.yml"
+  push:
+    branches: [main]
+    paths:
+      - "missions/4-sqrt2-irrational/**"
+      - "tools/lean/**"
+      - ".github/workflows/verify-lean.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Cache Lean toolchains
+        uses: actions/cache@v4
+        with:
+          path: ~/.elan/toolchains
+          key: elan-${{ hashFiles('missions/*/challenge/lean-toolchain') }}
+
+      - name: Cache comparator build
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mission-land/comparator
+          key: comparator-${{ hashFiles('tools/lean/comparator.lock') }}
+
+      - name: Install landrun (sandbox; best effort)
+        run: |
+          go install github.com/Zouuup/landrun@main \
+            && echo "$HOME/go/bin" >> "$GITHUB_PATH" \
+            || echo "::warning::landrun install failed — solutions build unsandboxed in this ephemeral runner"
+
+      - name: Verify all proof-mission records
+        run: |
+          set -euo pipefail
+          found=0
+          for d in missions/*/; do
+            [ -f "${d}challenge/comparator-config.json" ] || continue
+            for r in "${d}"records/*.json; do
+              found=1
+              echo "::group::${r}"
+              python3 "${d}verify.py" "$r"
+              echo "::endgroup::"
+            done
+          done
+          [ "$found" = "1" ] || echo "no proof missions found"

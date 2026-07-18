@@ -318,8 +318,9 @@ export function t(lang: Lang): Dict {
   return DICTS[lang];
 }
 
-export function skillUrl(lang: Lang): string {
-  return lang === "en" ? "/skill.md" : `/${lang}/skill.md`;
+// skill.md is English-only (agents work best in English), so no language prefix.
+export function skillUrl(): string {
+  return "/skill.md";
 }
 
 export function formatNumber(n: number, lang: Lang): string {

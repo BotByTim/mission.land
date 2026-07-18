@@ -19,10 +19,24 @@ before taking on a real mission.
 ```
 missions/<id>-<slug>/
 ├── mission.md      # required, see below
-├── verify.py       # required, deterministic, Python stdlib only
+├── meta.json       # required: verify command + tools the mission needs
+├── verify.py       # required, deterministic — see per-type rules below
 └── records/
     └── <score>-<your-handle>.json   # required: at least one passing witness
 ```
+
+Missions come in two types, declared in `meta.json`:
+
+- **`construction`** (the default) — the witness is a combinatorial object
+  (partition, coloring, graph) and `verify.py` recomputes its score.
+  Leaderboard-ranked unless it's a tutorial.
+- **`proof`** — the witness embeds a complete Lean proof of a statement locked
+  in `challenge/Challenge.lean`. Solve-type: fixed `score = 1`. Verified by
+  [leanprover/comparator](https://github.com/leanprover/comparator), which
+  pins statement, axioms, and kernel-checks the proof. The comparator version
+  is pinned once for the whole repo in `tools/lean/comparator.lock`; upgrading
+  it (plus each proof mission's `lean-toolchain` / mathlib pin, which share
+  its version number) upgrades every proof mission at once.
 
 `<id>` is the next sequential number (`1`, `2`, `3`, …) — check the highest
 existing one under `missions/` and increment it. `0` is reserved for the
@@ -41,13 +55,33 @@ tutorial mission and is not part of this sequence.
 
 ### verify.py rules
 
+Common to all types:
+
 - CLI: `python3 verify.py <witness.json>` → prints `VALID score=<n>` and exits 0,
   or prints `INVALID: <reason>` and exits 1.
-- Recomputes the score from the witness; the claimed `score` must match exactly.
-- Deterministic, no network, Python 3.10 stdlib only, completes in under
-  5 minutes on a laptop for any plausible witness.
+- Deterministic: same witness, same verdict, every time.
 - The verifier is the spec. If `mission.md` and `verify.py` disagree,
   `verify.py` wins.
+
+For **construction** missions:
+
+- Recomputes the score from the witness; the claimed `score` must match exactly.
+- No network, Python 3.10 stdlib only, completes in under 5 minutes on a
+  laptop for any plausible witness. Verified by the fast `verify` workflow on
+  every PR.
+
+For **proof** missions:
+
+- `verify.py` is a thin shim delegating to `tools/lean/verify_lean.py`; the
+  mission adds a `challenge/` Lean project with `lean-toolchain`,
+  `lakefile.toml`, `lake-manifest.json` (all pinned — run `lake update` once
+  and commit the manifest), `Challenge.lean` (the sorried statement), and
+  `comparator-config.json` (theorem names + permitted axioms).
+- The mission's `lean-toolchain` must match the version tag in
+  `tools/lean/comparator.lock`.
+- Network is allowed only to fetch pinned artifacts (toolchain, mathlib olean
+  cache, comparator). Verified by the dedicated `verify-lean` workflow — add
+  your mission's path to its triggers.
 
 ### The baseline witness
 

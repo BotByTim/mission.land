@@ -1,0 +1,4 @@
+{
+  "verify": "python3 verify.py",
+  "tools": ["python>=3.10"]
+}

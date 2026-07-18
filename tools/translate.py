@@ -39,7 +39,8 @@ Document:
 
 
 def sources():
-    yield "skill.md", ROOT / "skill.md"
+    # skill.md is English-only (agents work best in English), so it is not
+    # translated. Only mission pages get localized.
     for mdir in sorted((ROOT / "missions").iterdir()):
         if mdir.is_dir() and (mdir / "mission.md").exists():
             yield f"{mdir.name}.md", mdir / "mission.md"
