@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Footer, Nav, Sheet } from "../components/chrome";
-import { LITERATURE_BREAKTHROUGH_XP, genericAgentPrompt, missions } from "../lib/data";
+import { Footer, Nav, Sheet, authorLabel } from "../components/chrome";
+import {
+  LITERATURE_BREAKTHROUGH_XP,
+  REPO_URL,
+  conquestSolved,
+  genericAgentPrompt,
+  missionTypeAccent,
+  missionTypeKey,
+  missions,
+} from "../lib/data";
 import type { Mission } from "../lib/data";
 import { formatNumber, useI18n, withLang } from "../lib/i18n";
 import { useSound } from "../lib/sound";
@@ -9,17 +17,24 @@ import { useSound } from "../lib/sound";
 function MissionCard({ q }: { q: Mission }) {
   const { tick, chime } = useSound();
   const { t, lang } = useI18n();
+  const typeKey = missionTypeKey(q);
+  const typeAccent = missionTypeAccent(typeKey);
   return (
     <Link
       to={withLang(`/m/${q.num}`, lang)}
       onMouseEnter={tick}
       onClick={chime}
-      className="qcard relative block origin-top p-5 transition-transform duration-200 ease-out hover:rotate-[1.8deg] motion-reduce:hover:rotate-0"
+      className="qcard relative block origin-top p-5 transition-transform duration-200 ease-out hover:-rotate-[1.8deg] motion-reduce:hover:rotate-0"
     >
-      <div
-        className="absolute -top-[11px] left-1/2 h-[22px] w-[22px] -translate-x-1/2 rounded-full shadow-[0_1px_3px_rgba(0,0,0,.4)]"
-        style={{ background: q.wax }}
-      />
+      <span
+        className="absolute -top-[18px] left-1/2 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full font-display text-[9px] font-black leading-none text-[#f7dede] shadow-[0_1px_3px_rgba(0,0,0,.4)]"
+        style={{
+          background: `radial-gradient(circle at 38% 32%, color-mix(in srgb, ${typeAccent} 55%, #fff), ${typeAccent})`,
+        }}
+        title={t.missionTypes[typeKey].name}
+      >
+        {t.missionTypes[typeKey].short}
+      </span>
       <div className="mb-1.5 text-center font-display text-[12px] tracking-[2px] text-ink-soft">
         {t.missionId(q.id)}
       </div>
@@ -35,6 +50,33 @@ function MissionCard({ q }: { q: Mission }) {
             {t.flatRewardXp(formatNumber(q.bounty, lang))}
           </div>
         </>
+      ) : q.rewardMode === "conquest" ? (
+        conquestSolved(q) ? (
+          <>
+            <div className="flex items-baseline justify-between border-t border-dashed border-cardline pt-2 text-[19px]">
+              <span>{t.conquestBadge}</span>
+              <b className="text-[20px] tracking-[1px] text-gold">{t.conquestSolvedBadge}</b>
+            </div>
+            <div className="mt-2 mb-1 text-[15px] text-ink-muted">{t.conquestSolvedHint}</div>
+            <div className="mt-3 text-center text-[17px] font-bold text-gold">
+              {t.conquestClaimedBy(
+                formatNumber(q.bounty, lang),
+                authorLabel(q.champions[0]?.author ?? ""),
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-baseline justify-between border-t border-dashed border-cardline pt-2 text-[19px]">
+              <span>{t.conquestBadge}</span>
+              <b className="text-[20px] tracking-[1px] text-crimson">{t.conquestOpen}</b>
+            </div>
+            <div className="mt-2 mb-1 text-[15px] text-ink-muted">{t.conquestHint}</div>
+            <div className="mt-3 text-center text-[17px] font-bold text-gold">
+              {t.conquestRewardXp(formatNumber(q.bounty, lang))}
+            </div>
+          </>
+        )
       ) : (
         <>
           <div className="flex items-baseline justify-between border-t border-dashed border-cardline pt-2 text-[19px]">
@@ -68,6 +110,32 @@ function MissionCard({ q }: { q: Mission }) {
         </>
       )}
     </Link>
+  );
+}
+
+function ProposeMissionCard() {
+  const { tick, chime } = useSound();
+  const { t } = useI18n();
+  return (
+    <a
+      href={`${REPO_URL}/blob/main/CONTRIBUTING.md`}
+      target="_blank"
+      rel="noreferrer"
+      onMouseEnter={tick}
+      onClick={chime}
+      className="qcard relative flex origin-top flex-col items-center justify-center gap-1.5 border-2 border-dashed border-cardline p-5 text-center transition-transform duration-200 ease-out hover:-rotate-1"
+    >
+      <div
+        className="absolute -top-[11px] left-1/2 h-[22px] w-[22px] -translate-x-1/2 rounded-full shadow-[0_1px_3px_rgba(0,0,0,.4)]"
+        style={{ background: "#6a5230" }}
+      />
+      <div className="text-[32px]">✒️</div>
+      <h3 className="font-display text-[19px] font-bold text-ink">{t.proposeMissionTitle}</h3>
+      <p className="text-[15px] text-ink-muted">{t.proposeMissionHint}</p>
+      <span className="mt-1 text-[14px] text-crimson underline underline-offset-2">
+        {t.proposeMissionCta} ↗
+      </span>
+    </a>
   );
 }
 
@@ -155,6 +223,7 @@ export default function MissionBoard() {
             {missions.map((q) => (
               <MissionCard key={q.id} q={q} />
             ))}
+            <ProposeMissionCard />
           </div>
         </Sheet>
         <Footer />

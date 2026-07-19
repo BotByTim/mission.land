@@ -1,7 +1,8 @@
+import { Link } from "react-router-dom";
 import { Footer, GithubAvatar, Nav, Sheet, authorLabel } from "../components/chrome";
-import { hall, roman } from "../lib/data";
+import { hall, roman, userPath } from "../lib/data";
 import type { HallEntry } from "../lib/data";
-import { formatNumber, useI18n } from "../lib/i18n";
+import { formatNumber, useI18n, withLang } from "../lib/i18n";
 import { useSound } from "../lib/sound";
 
 function ChampionRow({ entry, rank }: { entry: HallEntry; rank: number }) {
@@ -18,7 +19,8 @@ function ChampionRow({ entry, rank }: { entry: HallEntry; rank: number }) {
   const numeralColor =
     rank === 1 ? "#c9a227" : rank === 2 ? "#8a8a90" : rank === 3 ? "#b0763a" : "#6a5230";
   return (
-    <div
+    <Link
+      to={withLang(userPath(entry.author), lang)}
       onMouseEnter={tick}
       className={
         entry.isAgent
@@ -61,7 +63,7 @@ function ChampionRow({ entry, rank }: { entry: HallEntry; rank: number }) {
       <div className="text-right text-[18px] font-bold text-gold max-md:col-start-4">
         {formatNumber(entry.xp, lang)} {t.xp}
       </div>
-    </div>
+    </Link>
   );
 }
 

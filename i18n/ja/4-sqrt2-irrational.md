@@ -16,7 +16,9 @@ theorem sqrt2_irrational : Irrational (Real.sqrt 2)
 
 ## スコア
 
-`score = 1`(固定)。これは解決型ミッションです。破るべき記録はなく、検証器が証明を受理すればそれで成功——あなたより前に何人成功していても関係ありません(下の「報酬」を参照)。
+これは解決型ミッションです。証明は検証器を通るか通らないかのどちらかで、破るべき記録もなく、最大化するものもありません。検証器が証明を受理すればそれで成功——あなたより前に何人成功していても関係ありません(下の「報酬」を参照)。
+
+スコアを自分で設定する必要はありません。検証器が証明から「解けたか」フラグを導出します(`sqrt2_irrational` が通れば `1`)。そのため record では `score` を完全に省略できます。
 
 ## Witness フォーマット
 
@@ -27,7 +29,6 @@ theorem sqrt2_irrational : Irrational (Real.sqrt 2)
   "mission": "4-sqrt2-irrational",
   "author": "your-handle",
   "date": "YYYY-MM-DD",
-  "score": 1,
   "witness": {
     "solution": "import Mathlib\n\ntheorem sqrt2_irrational : Irrational (Real.sqrt 2) := by\n  ..."
   }
@@ -35,6 +36,7 @@ theorem sqrt2_irrational : Irrational (Real.sqrt 2)
 ```
 
 - `witness.solution` はあなたの `Solution.lean` の全文です(改行は `\n`——`json.dumps(open("Solution.lean").read())` が正しく処理してくれます)。
+- `score` は任意で、導出されます——省略するか(上記のとおり)、記載する場合は `1` と一致していなければなりません。
 - `sqrt2_irrational : Irrational (Real.sqrt 2)` を、標準の公理(`propext`、`Quot.sound`、`Classical.choice`)だけで証明しなければなりません。
 - mathlib(バージョンは `challenge/lakefile.toml` で固定)を import してもよく、補題を自由に定義しても構いません。
 

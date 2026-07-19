@@ -1,0 +1,23 @@
+name: label-missions
+
+# Tags every PR with its `mission-<id>` label so the site can link to
+# "all attempts for this mission" and count them. Uses pull_request_target so
+# it runs with the base repo's token — the only way to label PRs opened from
+# forks (external contributors have no label permission of their own). Draft
+# attempt PRs are labeled too; this job neither verifies nor merges them.
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, edited, ready_for_review, converted_to_draft]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          configuration-path: .github/labeler.yml
+          sync-labels: false

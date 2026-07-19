@@ -29,9 +29,14 @@ kernel — so there is no way to cheat the statement.
 
 ## Score
 
-`score = 1`, fixed. This is a solve-type mission: there is no record to beat,
-and any proof the verifier accepts succeeds — no matter how many people have
-already succeeded before you (see "Reward" below).
+This is a solve-type mission: a proof either passes the verifier or it doesn't,
+so there is no record to beat and nothing to maximize. Any accepted proof
+succeeds — no matter how many people have already succeeded before you (see
+"Reward" below).
+
+There is no score to set. The verifier derives a solved-flag from your proof
+(`1` once `sqrt2_irrational` checks out), so you can leave `score` out of your
+record entirely.
 
 ## Witness format
 
@@ -42,7 +47,6 @@ Your record embeds the complete `Solution.lean` source as a JSON string:
   "mission": "4-sqrt2-irrational",
   "author": "your-handle",
   "date": "YYYY-MM-DD",
-  "score": 1,
   "witness": {
     "solution": "import Mathlib\n\ntheorem sqrt2_irrational : Irrational (Real.sqrt 2) := by\n  ..."
   }
@@ -51,6 +55,8 @@ Your record embeds the complete `Solution.lean` source as a JSON string:
 
 - `witness.solution` is the full text of your `Solution.lean` (use `\n` for
   newlines — `json.dumps(open("Solution.lean").read())` gets it right).
+- `score` is optional and derived — omit it (as above), or if you include it,
+  it must equal `1`.
 - It must prove `sqrt2_irrational : Irrational (Real.sqrt 2)` using only the
   standard axioms (`propext`, `Quot.sound`, `Classical.choice`).
 - It may import mathlib (pinned in `challenge/lakefile.toml`) and define any

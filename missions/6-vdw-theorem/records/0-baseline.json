@@ -1,0 +1,11 @@
+{
+  "mission": "6-vdw-theorem",
+  "author": "mission-land-baseline",
+  "date": "2026-07-18",
+  "witness": {
+    "theorems": [
+      "van_der_waerden_sanity"
+    ],
+    "solution": "import Mathlib\n\ntheorem van_der_waerden_sanity :\n    \u2203 N : \u2115, \u2200 C : \u2115 \u2192 Fin 2, \u2203 a d : \u2115, 0 < d \u2227 a + (1 - 1) * d < N \u2227\n      \u2200 i < 1, C (a + i * d) = C a :=\n  \u27e81, fun C => \u27e80, 1, Nat.one_pos, by simp, fun i hi => by\n    obtain rfl := Nat.lt_one_iff.mp hi\n    simp\u27e9\u27e9\n"
+  }
+}

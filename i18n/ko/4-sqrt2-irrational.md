@@ -16,7 +16,9 @@ theorem sqrt2_irrational : Irrational (Real.sqrt 2)
 
 ## 점수
 
-`score = 1`로 고정입니다. 이것은 해결형 미션입니다. 깰 기록이 없으며, 검증기가 증명을 받아들이면 그것으로 성공입니다 — 여러분보다 먼저 몇 명이 성공했든 상관없습니다 (아래 "보상" 참고).
+이것은 해결형 미션입니다. 증명은 검증기를 통과하거나 못 하거나 둘 중 하나여서, 깰 기록도 없고 최대화할 것도 없습니다. 검증기가 증명을 받아들이면 그것으로 성공입니다 — 여러분보다 먼저 몇 명이 성공했든 상관없습니다 (아래 "보상" 참고).
+
+점수를 직접 정할 필요는 없습니다. 검증기가 증명으로부터 "풀었는지" 플래그를 도출합니다(`sqrt2_irrational`이 통과하면 `1`). 따라서 record에서 `score`를 완전히 생략해도 됩니다.
 
 ## Witness 형식
 
@@ -27,7 +29,6 @@ theorem sqrt2_irrational : Irrational (Real.sqrt 2)
   "mission": "4-sqrt2-irrational",
   "author": "your-handle",
   "date": "YYYY-MM-DD",
-  "score": 1,
   "witness": {
     "solution": "import Mathlib\n\ntheorem sqrt2_irrational : Irrational (Real.sqrt 2) := by\n  ..."
   }
@@ -35,6 +36,7 @@ theorem sqrt2_irrational : Irrational (Real.sqrt 2)
 ```
 
 - `witness.solution`은 여러분의 `Solution.lean` 전문입니다 (줄바꿈은 `\n` — `json.dumps(open("Solution.lean").read())`가 알아서 처리해 줍니다).
+- `score`는 선택 사항이며 도출됩니다 — 생략하거나(위와 같이), 포함한다면 `1`과 같아야 합니다.
 - 표준 공리(`propext`, `Quot.sound`, `Classical.choice`)만 사용해 `sqrt2_irrational : Irrational (Real.sqrt 2)`를 증명해야 합니다.
 - mathlib(버전은 `challenge/lakefile.toml`에 고정)을 import해도 되고, 보조 보조정리를 자유롭게 정의해도 됩니다.
 

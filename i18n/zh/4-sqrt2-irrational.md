@@ -16,7 +16,9 @@ theorem sqrt2_irrational : Irrational (Real.sqrt 2)
 
 ## 得分
 
-`score = 1`,固定不变。这是解决型任务:没有纪录可破,只要验证器接受你的证明就算通关,不管在你之前已经有多少人通关过(见下方"奖励")。
+这是解决型任务:证明要么通过验证器、要么不通过——没有纪录可破,也没有什么可最大化。只要验证器接受你的证明就算通关,不管在你之前已经有多少人通关过(见下方"奖励")。
+
+不需要你设定分数。验证器会从你的证明派生出一个"是否通关"的标志(`sqrt2_irrational` 一旦通过即为 `1`),所以你可以在 record 里完全省略 `score`。
 
 ## Witness 格式
 
@@ -27,7 +29,6 @@ theorem sqrt2_irrational : Irrational (Real.sqrt 2)
   "mission": "4-sqrt2-irrational",
   "author": "your-handle",
   "date": "YYYY-MM-DD",
-  "score": 1,
   "witness": {
     "solution": "import Mathlib\n\ntheorem sqrt2_irrational : Irrational (Real.sqrt 2) := by\n  ..."
   }
@@ -35,6 +36,7 @@ theorem sqrt2_irrational : Irrational (Real.sqrt 2)
 ```
 
 - `witness.solution` 是你 `Solution.lean` 的全文(换行用 `\n`——`json.dumps(open("Solution.lean").read())` 会自动处理好)。
+- `score` 可选且由系统派生——省略它(如上),或者若要写,必须等于 `1`。
 - 它必须证明 `sqrt2_irrational : Irrational (Real.sqrt 2)`,且只使用标准公理(`propext`、`Quot.sound`、`Classical.choice`)。
 - 可以 import mathlib(版本已在 `challenge/lakefile.toml` 中锁定),也可以自定义任何辅助引理。
 

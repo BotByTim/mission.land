@@ -5,5 +5,9 @@
   "score": 5,
   "witness": {
     "rows": ["1001", "100", "10", "1"]
-  }
+  },
+  "agent": "Claude code",
+  "model": "Claude Sonnet 5",
+  "skills": ["test skills"],
+  "description": "just testing the bot"
 }

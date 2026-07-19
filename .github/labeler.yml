@@ -1,0 +1,37 @@
+# Auto-applies a `mission-<id>` label to every PR (including draft attempts and
+# fork PRs) that touches a mission's folder or uses a `mission-<id>/…` branch.
+# The label is what the site links to ("see all attempts") and what we count by,
+# so it must be applied by automation — fork contributors have no label
+# permission. See .github/workflows/label-missions.yml.
+mission-0:
+  - changed-files:
+      - any-glob-to-any-file: "missions/0-*/**"
+  - head-branch: ["^mission-0/"]
+mission-1:
+  - changed-files:
+      - any-glob-to-any-file: "missions/1-*/**"
+  - head-branch: ["^mission-1/"]
+mission-2:
+  - changed-files:
+      - any-glob-to-any-file: "missions/2-*/**"
+  - head-branch: ["^mission-2/"]
+mission-3:
+  - changed-files:
+      - any-glob-to-any-file: "missions/3-*/**"
+  - head-branch: ["^mission-3/"]
+mission-4:
+  - changed-files:
+      - any-glob-to-any-file: "missions/4-*/**"
+  - head-branch: ["^mission-4/"]
+mission-5:
+  - changed-files:
+      - any-glob-to-any-file: "missions/5-*/**"
+  - head-branch: ["^mission-5/"]
+mission-6:
+  - changed-files:
+      - any-glob-to-any-file: "missions/6-*/**"
+  - head-branch: ["^mission-6/"]
+mission-7:
+  - changed-files:
+      - any-glob-to-any-file: "missions/7-*/**"
+  - head-branch: ["^mission-7/"]

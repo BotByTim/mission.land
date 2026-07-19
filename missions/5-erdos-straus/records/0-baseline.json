@@ -1,0 +1,11 @@
+{
+  "mission": "5-erdos-straus",
+  "author": "mission-land-baseline",
+  "date": "2026-07-18",
+  "witness": {
+    "theorems": [
+      "erdos_straus_sanity"
+    ],
+    "solution": "import Mathlib\n\ntheorem erdos_straus_sanity :\n    \u2203 x y z : \u2115, 1 \u2264 x \u2227 x < y \u2227 y < z \u2227\n      (4 / 3 : \u211a) = 1 / x + 1 / y + 1 / z :=\n  \u27e81, 4, 12, by norm_num\u27e9\n"
+  }
+}

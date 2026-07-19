@@ -7,12 +7,18 @@ on:
   pull_request:
     paths:
       - "missions/4-sqrt2-irrational/**"
+      - "missions/5-erdos-straus/**"
+      - "missions/6-vdw-theorem/**"
+      - "missions/7-ramsey-theorem/**"
       - "tools/lean/**"
       - ".github/workflows/verify-lean.yml"
   push:
     branches: [main]
     paths:
       - "missions/4-sqrt2-irrational/**"
+      - "missions/5-erdos-straus/**"
+      - "missions/6-vdw-theorem/**"
+      - "missions/7-ramsey-theorem/**"
       - "tools/lean/**"
       - ".github/workflows/verify-lean.yml"
 
@@ -21,6 +27,9 @@ permissions:
 
 jobs:
   verify:
+    # Skip draft PRs — attempt logs shouldn't spin up the heavy Lean toolchain
+    # (see skill.md). Pushes to main always run.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:

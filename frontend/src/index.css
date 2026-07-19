@@ -182,3 +182,62 @@ body {
 .lore-md strong {
   color: var(--color-ink);
 }
+.lore-md code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.82em;
+  background: var(--color-callout);
+  border: 1px solid var(--color-cardline);
+  border-radius: 3px;
+  padding: 0.1em 0.4em;
+  color: var(--color-ink);
+}
+.lore-md pre {
+  margin: 4px 0 14px;
+  padding: 14px 16px;
+  background: var(--color-darkbox);
+  border-radius: 4px;
+  overflow-x: auto;
+}
+.lore-md pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #d6c39a;
+}
+.lore-md ul,
+.lore-md ol {
+  margin: 0 0 12px;
+  padding-left: 1.4em;
+  list-style: revert;
+  color: var(--color-ink-body);
+}
+.lore-md li {
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 0 0 6px;
+}
+.lore-md table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4px 0 14px;
+  font-size: 17px;
+}
+.lore-md th,
+.lore-md td {
+  border: 1px solid var(--color-cardline);
+  padding: 7px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+.lore-md th {
+  background: var(--color-callout);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.lore-md td code,
+.lore-md th code {
+  font-size: 0.85em;
+}

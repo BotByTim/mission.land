@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, useLocation, useParams } from "react-router-do
 import MissionBoard from "./pages/MissionBoard";
 import LeaderBoard from "./pages/LeaderBoard";
 import MissionDetail from "./pages/MissionDetail";
+import UserProfile from "./pages/UserProfile";
 import { langFromPath, withLang } from "./lib/i18n";
 import { SoundProvider } from "./lib/sound";
 
@@ -28,6 +29,10 @@ export default function App() {
         <Route path="/zh/m/:num" element={<MissionDetail />} />
         <Route path="/ja/m/:num" element={<MissionDetail />} />
         <Route path="/ko/m/:num" element={<MissionDetail />} />
+        <Route path="/u/:handle" element={<UserProfile />} />
+        <Route path="/zh/u/:handle" element={<UserProfile />} />
+        <Route path="/ja/u/:handle" element={<UserProfile />} />
+        <Route path="/ko/u/:handle" element={<UserProfile />} />
         <Route path="/quest/:num" element={<RedirectQuestToM />} />
         <Route path="/zh/quest/:num" element={<RedirectQuestToM />} />
         <Route path="/ja/quest/:num" element={<RedirectQuestToM />} />

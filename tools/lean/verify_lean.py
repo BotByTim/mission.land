@@ -45,6 +45,7 @@ CACHE_ROOT = Path(
     os.environ.get("MISSION_LAND_CACHE", Path.home() / ".cache" / "mission-land")
 )
 PROOF_SCORE = 1  # proof missions are solve-type: any valid proof scores 1
+METADATA_FIELDS = ("agent", "model", "skills", "description")
 
 
 def fail(reason: str):
@@ -123,6 +124,41 @@ def prepare_challenge(challenge: Path):
         fail("the pinned Challenge.lean failed to build — the mission is broken, report it")
 
 
+def resolve_claim(mission_dir: Path, challenge: Path, data: dict) -> tuple[list[str], int]:
+    """Determine which theorems this record must prove, and the score they earn.
+
+    Missions with a single mandatory statement (like mission 4) omit `proof` in
+    meta.json: every theorem in comparator-config.json is required, score = 1.
+
+    Research missions declare per-theorem scores in meta.json, e.g.
+        "proof": {"theorems": {"sanity": 0, "erdos_242": 1, "erdos_242_false": 1}}
+    and each record picks which locked theorems it proves via
+        "witness": {"theorems": ["erdos_242"], "solution": "..."}.
+    Score = max over the claimed theorems (a 0-score "sanity" theorem lets the
+    repo carry a pipeline-proving baseline without pretending the open problem
+    is solved).
+    """
+    config = json.loads((challenge / "comparator-config.json").read_text(encoding="utf-8"))
+    meta = json.loads((mission_dir / "meta.json").read_text(encoding="utf-8"))
+    proof_cfg = meta.get("proof")
+
+    if not proof_cfg:
+        return config["theorem_names"], PROOF_SCORE
+
+    weights = proof_cfg["theorems"]
+    locked = set(config["theorem_names"])
+    if set(weights) != locked:
+        fail("meta.json proof.theorems and comparator-config.json theorem_names disagree — mission is broken")
+
+    claimed = data.get("witness", {}).get("theorems")
+    if not isinstance(claimed, list) or not claimed or not all(isinstance(t, str) for t in claimed):
+        fail('witness.theorems must be a non-empty list naming which locked theorems you prove, e.g. ["erdos_242"]')
+    unknown = [t for t in claimed if t not in locked]
+    if unknown:
+        fail(f"witness.theorems contains names not locked in the challenge: {unknown}")
+    return claimed, max(weights[t] for t in claimed)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--mission-dir", required=True, type=Path)
@@ -140,30 +176,50 @@ def main():
 
     if data.get("mission") != mission_id:
         fail(f"mission field must be {mission_id!r}")
-    if data.get("score") != PROOF_SCORE:
-        fail(f"score must be {PROOF_SCORE} for proof missions")
     solution = data.get("witness", {}).get("solution")
     if not isinstance(solution, str) or not solution.strip():
         fail("witness.solution must be the full Solution.lean source as a string")
+
+    required_theorems, score = resolve_claim(mission_dir, challenge, data)
+    # `score` is a derived solved-flag for proof missions (which theorems you
+    # proved, weighted), not a rank — so it's optional. If a record does declare
+    # it, it must match; if omitted, we use the computed value.
+    if "score" in data and data.get("score") != score:
+        fail(f"declared score {data.get('score')} != computed score {score} for theorems {required_theorems}")
 
     comparator_bin, lean4export_bin, fake_landrun = ensure_comparator()
     prepare_challenge(challenge)
 
     (challenge / "Solution.lean").write_text(solution, encoding="utf-8")
 
+    # Effective config = the committed statement lock, narrowed to the claimed
+    # theorems. Everything else (modules, permitted axioms) is copied verbatim.
+    config = json.loads((challenge / "comparator-config.json").read_text(encoding="utf-8"))
+    config["theorem_names"] = required_theorems
+    effective = challenge / ".lake" / "comparator-config.effective.json"
+    effective.parent.mkdir(exist_ok=True)
+    effective.write_text(json.dumps(config, indent=2), encoding="utf-8")
+
     env = os.environ.copy()
     env["COMPARATOR_LEAN4EXPORT"] = env.get("COMPARATOR_LEAN4EXPORT", str(lean4export_bin))
     env["COMPARATOR_LANDRUN"] = pick_landrun(fake_landrun)
 
     r = run(
-        ["lake", "env", comparator_bin, challenge / "comparator-config.json"],
+        ["lake", "env", comparator_bin, effective],
         cwd=challenge, env=env, step="comparator",
     )
     if r.returncode != 0:
         tail = (r.stdout or "").strip().splitlines()[-1:] or ["comparator rejected the solution"]
         fail(tail[0])
 
-    print(f"VALID score={PROOF_SCORE}")
+    # Non-blocking: real submissions should carry agent/model/skills/description
+    # (they power the solver profile pages), but missing them never fails CI.
+    if not str(data.get("author") or "").endswith("-baseline"):
+        missing = [f for f in METADATA_FIELDS if not data.get(f)]
+        if missing:
+            log(f"note: missing metadata: {', '.join(missing)}")
+
+    print(f"VALID score={score}")
     sys.exit(0)
 
 

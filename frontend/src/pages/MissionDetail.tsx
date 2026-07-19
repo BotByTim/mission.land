@@ -1,8 +1,23 @@
 import { useRef, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { Footer, GithubAvatar, Nav, Sheet, authorLabel } from "../components/chrome";
-import { LITERATURE_BREAKTHROUGH_XP, agentPrompt, missionByNum, roman } from "../lib/data";
-import { formatDateI18n, formatNumber, useI18n } from "../lib/i18n";
+import { RecordModal } from "../components/RecordModal";
+import { MissionTypesModal } from "../components/MissionTypesModal";
+import {
+  LITERATURE_BREAKTHROUGH_XP,
+  REPO_URL,
+  agentPrompt,
+  conquestSolved,
+  missionByNum,
+  missionTypeAccent,
+  missionTypeKey,
+  proofStatus,
+  roman,
+  userPath,
+  witnessTheorems,
+} from "../lib/data";
+import type { MissionRecord } from "../lib/data";
+import { formatDateI18n, formatNumber, useI18n, withLang } from "../lib/i18n";
 import { useSound } from "../lib/sound";
 
 export default function MissionDetail() {
@@ -13,10 +28,15 @@ export default function MissionDetail() {
   const [copied, setCopied] = useState(false);
   const copyTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const summonRef = useRef<HTMLDivElement>(null);
+  const recordLogRef = useRef<HTMLDivElement>(null);
+  const [openRecord, setOpenRecord] = useState<MissionRecord | null>(null);
+  const [typesOpen, setTypesOpen] = useState(false);
 
   if (!q) return <Navigate to="/" replace />;
 
   const prompt = agentPrompt(q);
+  const typeKey = missionTypeKey(q);
+  const accent = missionTypeAccent(typeKey);
 
   const copy = () => {
     void navigator.clipboard?.writeText(prompt).catch(() => {});
@@ -47,24 +67,60 @@ export default function MissionDetail() {
               <h1 className="mb-2 font-display text-[42px] font-black leading-tight text-ink max-md:text-[28px]">
                 {q.name[lang]}
               </h1>
-              <div className="text-[22px] text-ink-body">{q.tagline}</div>
+              <div className="text-[22px] text-ink-body">{q.tagline[lang]}</div>
             </div>
-            <div className="seal flex h-[74px] w-[74px] shrink-0 items-center justify-center rounded-full bg-[radial-gradient(circle_at_40%_35%,#c0433f,#7a1f1f)] font-display text-[15px] font-black text-[#f7dede]">
-              {t.seal}
-            </div>
+            <button
+              type="button"
+              onMouseEnter={tick}
+              onClick={() => setTypesOpen(true)}
+              title={t.missionTypes[typeKey].name}
+              aria-label={t.missionTypes[typeKey].name}
+              className="seal flex h-[74px] w-[74px] shrink-0 cursor-pointer items-center justify-center rounded-full border-0 px-1 text-center font-display text-[15px] font-black leading-none text-[#f7dede] transition-transform hover:scale-105"
+              style={{
+                background: `radial-gradient(circle at 38% 32%, color-mix(in srgb, ${accent} 55%, #fff), ${accent})`,
+              }}
+            >
+              {t.missionTypes[typeKey].short}
+            </button>
           </div>
 
           {/* record + actions */}
           <div className="mb-7 grid grid-cols-2 gap-[26px] max-md:grid-cols-1">
             <div className="qcard px-6 py-[22px]">
               {q.rewardMode === "completion" ? (
-                <>
+                <button
+                  type="button"
+                  onMouseEnter={tick}
+                  onClick={() =>
+                    recordLogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+                  }
+                  className="block w-full cursor-pointer border-0 bg-transparent p-0 text-left"
+                >
                   <div className="mb-0.5 text-[18px] text-ink-muted">{t.tutorialBadge}</div>
                   <div className="font-display text-[52px] font-black leading-[1.05] text-ink">
                     {q.adventurers}
                   </div>
-                  <div className="mt-2 text-[17px] text-ink-muted">{t.tutorialHint}</div>
-                </>
+                  <div className="mt-2 text-[17px] text-ink-muted">{t.tutorialCompleted}</div>
+                  <div className="mt-1 text-[15px] text-crimson">{t.tutorialSeeRecords} ↓</div>
+                </button>
+              ) : q.rewardMode === "conquest" ? (
+                conquestSolved(q) ? (
+                  <>
+                    <div className="mb-0.5 text-[18px] text-ink-muted">{t.conquestBadge}</div>
+                    <div className="font-display text-[44px] font-black leading-[1.1] tracking-[2px] text-gold">
+                      {t.conquestSolvedBadge}
+                    </div>
+                    <div className="mt-2 text-[17px] text-ink-muted">{t.conquestSolvedHint}</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="mb-0.5 text-[18px] text-ink-muted">{t.conquestBadge}</div>
+                    <div className="font-display text-[44px] font-black leading-[1.1] tracking-[2px] text-crimson">
+                      {t.conquestOpen}
+                    </div>
+                    <div className="mt-2 text-[17px] text-ink-muted">{t.conquestHint}</div>
+                  </>
+                )
               ) : (
                 <>
                   <div className="mb-0.5 text-[18px] text-ink-muted">{t.verifiedRecord}</div>
@@ -103,10 +159,17 @@ export default function MissionDetail() {
                   {formatNumber(q.bounty, lang)} {t.xp}
                 </b>
               </div>
-              <div className="flex items-center justify-between border border-cardline bg-card px-5 py-4">
+              <a
+                href={`${REPO_URL}/pulls?q=${encodeURIComponent(`is:pr label:mission-${q.id}`)}`}
+                target="_blank"
+                rel="noreferrer"
+                onMouseEnter={tick}
+                title={t.adventurersTriedHint}
+                className="flex items-center justify-between border border-cardline bg-card px-5 py-4 transition-colors hover:bg-card-hover"
+              >
                 <span className="text-[20px]">{t.adventurersTried}</span>
-                <b className="font-display text-[24px] text-ink">{q.adventurers}</b>
-              </div>
+                <span className="text-[15px] text-crimson">GitHub ↗</span>
+              </a>
               <button
                 type="button"
                 className="btn-quest p-4 text-[22px]"
@@ -139,6 +202,31 @@ export default function MissionDetail() {
             <div className="lore-md" dangerouslySetInnerHTML={{ __html: q.loreHtml[lang] }} />
           </div>
 
+          {/* remaining mission.md sections (Score, Witness format, Reward,
+              Known approaches) — collapsed so a raw witness isn't the only
+              thing a reader has to go on */}
+          {q.guide.length > 0 && (
+            <div className="mb-7 flex flex-col gap-2">
+              {q.guide.map((g) => (
+                <details key={g.title.en} className="group border border-cardline bg-card px-[18px] py-3">
+                  <summary
+                    onMouseEnter={tick}
+                    className="cursor-pointer list-none font-display text-[16px] tracking-[1px] text-ink-soft marker:content-none [&::-webkit-details-marker]:hidden"
+                  >
+                    <span className="mr-2 inline-block text-crimson transition-transform group-open:rotate-90">
+                      ▸
+                    </span>
+                    {g.title[lang]}
+                  </summary>
+                  <div
+                    className="lore-md mt-3 border-t border-divider pt-3"
+                    dangerouslySetInnerHTML={{ __html: g.html[lang] }}
+                  />
+                </details>
+              ))}
+            </div>
+          )}
+
           {/* summon your agent */}
           <div ref={summonRef} className="mb-[30px] rounded bg-darkbox px-[22px] py-5 text-callout">
             <div className="mb-2.5 flex items-center justify-between">
@@ -160,41 +248,80 @@ export default function MissionDetail() {
           </div>
 
           {/* record log */}
-          <div className="mb-[30px]">
+          <div ref={recordLogRef} className="mb-[30px] scroll-mt-4">
             <div className="mb-3.5 font-display text-[16px] tracking-[3px] text-ink-soft">
-              {q.rewardMode === "completion" ? t.recordLogTutorial : t.recordLog}
+              {q.rewardMode === "completion"
+                ? t.recordLogTutorial
+                : q.rewardMode === "conquest"
+                  ? t.recordLogConquest
+                  : t.recordLog}
             </div>
             <div className="flex flex-col gap-2">
-              {q.records.map((r) => (
-                <div
-                  key={`${r.score}-${r.author}`}
-                  onMouseEnter={tick}
-                  className="qrow qrow-slide grid grid-cols-[70px_44px_1fr_150px] items-center gap-3.5 px-4 py-[9px] max-md:grid-cols-[56px_40px_1fr]"
-                >
-                  <span className="font-display text-[26px] font-black text-ink">{r.score}</span>
-                  <GithubAvatar author={r.author} size={36} border="#b89a63" />
-                  <span className="text-[19px] text-ink-body">
-                    {authorLabel(r.author)}
-                    {r.seed ? (
-                      <span className="ml-2 text-[15px] italic text-ink-soft">{t.guildSeed}</span>
-                    ) : (
-                      <a
-                        href={r.prUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        onMouseEnter={tick}
-                        className="ml-2 text-[14px] text-crimson underline underline-offset-2"
+              {q.records.map((r) => {
+                const theorems = witnessTheorems(r.witness);
+                const status = proofStatus(r);
+                return (
+                  <div
+                    key={`${r.score}-${r.author}`}
+                    onMouseEnter={tick}
+                    onClick={() => setOpenRecord(r)}
+                    className="qrow qrow-slide grid cursor-pointer grid-cols-[70px_44px_1fr_150px] items-center gap-3.5 px-4 py-[9px] max-md:grid-cols-[56px_40px_1fr]"
+                  >
+                    {status ? (
+                      <span
+                        className={`font-display text-[15px] font-black leading-tight ${
+                          status === "proved" ? "text-quest-green" : "text-ink-soft"
+                        }`}
                       >
-                        PR ↗
-                      </a>
+                        {status === "proved" ? `✓ ${t.proofProved}` : t.proofSanity}
+                      </span>
+                    ) : (
+                      <span className="font-display text-[26px] font-black text-ink">{r.score}</span>
                     )}
-                  </span>
-                  <span className="text-right text-[16px] text-ink-soft max-md:hidden">
-                    {formatDateI18n(r.date, lang)}
-                    {r.current && q.rewardMode !== "completion" && ` · ${t.current}`}
-                  </span>
-                </div>
-              ))}
+                    {r.seed ? (
+                      <GithubAvatar author={r.author} size={36} border="#b89a63" />
+                    ) : (
+                      <Link
+                        to={withLang(userPath(r.author), lang)}
+                        onClick={(e) => e.stopPropagation()}
+                        onMouseEnter={tick}
+                      >
+                        <GithubAvatar author={r.author} size={36} border="#b89a63" />
+                      </Link>
+                    )}
+                    <span className="text-[19px] text-ink-body">
+                      {authorLabel(r.author)}
+                      {theorems && theorems.length > 0 && (
+                        <span className="ml-2 text-[14px] text-ink-soft">
+                          · {t.recordProves.toLowerCase()}: {theorems.join(", ")}
+                        </span>
+                      )}
+                      {r.seed ? (
+                        <span className="ml-2 text-[15px] italic text-ink-soft">
+                          {status === "sanity" ? t.sanitySeed : t.guildSeed}
+                        </span>
+                      ) : (
+                        <a
+                          href={r.prUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          onMouseEnter={tick}
+                          onClick={(e) => e.stopPropagation()}
+                          className="ml-2 text-[14px] text-crimson underline underline-offset-2"
+                        >
+                          file ↗
+                        </a>
+                      )}
+                    </span>
+                    <span className="text-right text-[16px] text-ink-soft max-md:hidden">
+                      {formatDateI18n(r.date, lang)}
+                      {q.rewardMode === "conquest"
+                        ? r.score > 0 && ` · ${t.conquestAccepted}`
+                        : r.current && q.rewardMode !== "completion" && ` · ${t.current}`}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -208,8 +335,9 @@ export default function MissionDetail() {
                 <div className="py-3 text-[18px] italic text-ink-soft">{t.noChampionYet}</div>
               ) : (
                 q.champions.map((c, i) => (
-                  <div
+                  <Link
                     key={c.author}
+                    to={withLang(userPath(c.author), lang)}
                     onMouseEnter={tick}
                     className="qrow grid grid-cols-[44px_44px_1fr_120px] items-center gap-3.5 px-4 py-[9px]"
                   >
@@ -221,7 +349,7 @@ export default function MissionDetail() {
                     <span className="text-right text-[16px] font-bold text-gold">
                       {formatNumber(c.xp, lang)} {t.xp}
                     </span>
-                  </div>
+                  </Link>
                 ))
               )}
             </div>
@@ -229,6 +357,16 @@ export default function MissionDetail() {
         </Sheet>
         <Footer />
       </div>
+      {openRecord && (
+        <RecordModal
+          record={openRecord}
+          missionName={q.name[lang]}
+          onClose={() => setOpenRecord(null)}
+        />
+      )}
+      {typesOpen && (
+        <MissionTypesModal currentKey={typeKey} onClose={() => setTypesOpen(false)} />
+      )}
     </div>
   );
 }

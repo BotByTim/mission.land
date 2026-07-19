@@ -1,0 +1,11 @@
+{
+  "mission": "7-ramsey-theorem",
+  "author": "mission-land-baseline",
+  "date": "2026-07-18",
+  "witness": {
+    "theorems": [
+      "ramsey_sanity"
+    ],
+    "solution": "import Mathlib\n\ntheorem ramsey_sanity :\n    \u2203 N : \u2115, \u2200 C : \u2115 \u2192 \u2115 \u2192 Fin 2, \u2203 (c : Fin 2) (S : Finset \u2115),\n      S.card = 2 \u2227 (\u2200 n \u2208 S, n < N) \u2227\n      \u2200 i \u2208 S, \u2200 j \u2208 S, i < j \u2192 C i j = c :=\n  \u27e82, fun C => \u27e8C 0 1, {0, 1}, by decide, by decide, by\n    intro i hi j hj hij\n    fin_cases hi <;> fin_cases hj <;> first | rfl | omega\u27e9\u27e9\n"
+  }
+}

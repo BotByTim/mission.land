@@ -17,6 +17,21 @@ MISSIONS = ROOT / "missions"
 TIMEOUT_SECONDS = 300
 
 
+METADATA_FIELDS = ("agent", "model", "skills", "description")
+
+
+def _metadata_note(record: Path):
+    """Non-blocking: real submissions should carry agent/model/skills/description
+    (they power the solver profile pages), but missing them never fails CI —
+    old records predate the convention and verify.py is still the only spec."""
+    data = _read_record(record)
+    author = (data or {}).get("author") or ""
+    if not data or author.endswith("-baseline"):
+        return None
+    missing = [f for f in METADATA_FIELDS if not data.get(f)]
+    return f"missing metadata: {', '.join(missing)}" if missing else None
+
+
 def _needs_heavy_tools(mission_dir):
     """True when meta.json declares tools beyond Python — those missions are
     verified by their own dedicated workflow (e.g. verify-lean.yml), not here."""
@@ -44,7 +59,8 @@ def verify_all():
                      "valid": True, "skipped": True,
                      "score": _claimed_score(record),
                      "author": _author(record), "date": _date(record),
-                     "detail": "skipped here — verified by its dedicated workflow"}
+                     "detail": "skipped here — verified by its dedicated workflow",
+                     "metadata_note": _metadata_note(record)}
                 )
             continue
         if not verifier.exists():
@@ -79,7 +95,8 @@ def verify_all():
                      "score": score,
                      "author": _author(record),
                      "date": _date(record),
-                     "detail": out.splitlines()[0] if out else "no output"}
+                     "detail": out.splitlines()[0] if out else "no output",
+                     "metadata_note": _metadata_note(record)}
                 )
             except subprocess.TimeoutExpired:
                 results.append(
@@ -89,11 +106,16 @@ def verify_all():
     return results
 
 
-def _read_field(record: Path, field: str):
+def _read_record(record: Path):
     try:
-        return json.load(open(record)).get(field)
+        return json.load(open(record))
     except Exception:
         return None
+
+
+def _read_field(record: Path, field: str):
+    data = _read_record(record)
+    return data.get(field) if data else None
 
 
 def _author(record: Path):
@@ -113,6 +135,8 @@ def main():
     for r in results:
         status = "skip" if r.get("skipped") else ("ok " if r["valid"] else "FAIL")
         print(f"[{status}] {r['mission']}/{r.get('record')}: {r['detail']}")
+        if r.get("metadata_note"):
+            print(f"       note: {r['metadata_note']}")
     if not all(r["valid"] for r in results):
         sys.exit(1)
 
